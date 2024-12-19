@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model Prediction</title>
+  </head>
+  <body>
+    <h1>Model Prediction</h1>
+    <form id="predictForm">
+      <label for="inputData">Enter input data (comma-separated):</label
+      ><br /><br />
+      <input type="text" id="inputData" name="inputData" required />
+      <button type="submit">Predict</button>
+    </form>
+    <div id="result"></div>
+    <script>
+      document
+        .getElementById("predictForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const inputData = document
+            .getElementById("inputData")
+            .value.split(",")
+            .map(Number);
+
+          try {
+            const response = await fetch("/predict", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ input: inputData }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              document.getElementById(
+                "result"
+              ).innerHTML = `<h3>Predictions:</h3><p>${result.predictions.join(
+                ", "
+              )}</p>`;
+            } else {
+              document.getElementById(
+                "result"
+              ).innerHTML = `<h3>Error:</h3><p>${result.error}</p>`;
+            }
+          } catch (error) {
+            document.getElementById(
+              "result"
+            ).innerHTML = `<h3>Error:</h3><p>${error.message}</p>`;
+          }
+        });
+    </script>
+  </body>
+</html>
